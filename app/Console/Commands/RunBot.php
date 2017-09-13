@@ -54,7 +54,7 @@ class RunBot extends Command
         DriverManager::loadDriver(DiscordDriver::class);
         $botman = BotManFactory::createForDiscord(config('botman', [
             'discord' => [
-                'token' => 'MzU2ODU4MjM1MjA4MjA0Mjg4.DJhdsQ.1xjg_5UQYLL4oOp9LOuvS4-gtZE',
+                'token' => env('DISCORD_BOT_TOKEN'),
             ]
         ]), $loop, new ArrayCache());
 
