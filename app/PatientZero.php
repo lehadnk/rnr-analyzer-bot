@@ -45,7 +45,7 @@ class PatientZero extends AbstractStrategy
                 JOIN fights f ON bm.fight_id = f.id
                 WHERE bm.metric_id = :id AND f.raid_date = :raidDate
                 GROUP BY fi.name
-                ORDER BY cnt DESC
+                ORDER BY cnt DESC, name
         ", [
             ':raidDate' => $raidDate,
             ':id' => $this->metric_id,
