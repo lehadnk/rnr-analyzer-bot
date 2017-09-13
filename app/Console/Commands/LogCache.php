@@ -81,6 +81,11 @@ class LogCache extends Command
                 $this->warn("Warning: can't save fight with log_id {$this->logId} and id {$fight->id}: {$e->getMessage()} (Probably already existing?)");
             }
 
+            $this->call('fight:cache', [
+                'fight_id' => $model->id
+            ]);
         }
+
+
     }
 }

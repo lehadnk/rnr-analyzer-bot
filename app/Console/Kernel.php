@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\BossAdd;
+use App\Console\Commands\FightCache;
 use App\Console\Commands\LogCache;
 use App\Console\Commands\RunBot;
 use Illuminate\Console\Scheduling\Schedule;
@@ -18,7 +19,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         RunBot::class,
         LogCache::class,
-        BossAdd::class
+        BossAdd::class,
+        FightCache::class
     ];
 
     /**
