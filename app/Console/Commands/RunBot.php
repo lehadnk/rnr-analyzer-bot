@@ -2,6 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Conversations\BestAttempt;
+use App\Conversations\HowWasYourRaid;
+use App\Conversations\LastLog;
+use App\Conversations\Math;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Cache\ArrayCache;
@@ -67,10 +71,37 @@ class RunBot extends Command
             $apiIntent = $extras['apiIntent'] ?? null;
             $apiParameters = $extras['apiParameters'] ?? [];
 
-            $this->info($apiIntent);
-            $this->info(print_r($apiParameters, true));
+            var_dump($extras);
 
-            $bot->reply('Hello yourself, idiot.');
+            if ($apiReply) {
+                $bot->reply($apiReply);
+                /*$this->ask($apiReply, function (Answer $response) {
+                    $extras = $response->getMessage()->getExtras();
+                    var_dump($extras);
+                    //$this->attemptToAnswer();
+                    //$this->say('Cool - you said ' . $response->getText());
+                });*/
+            } else {
+                $this->info($apiIntent);
+                $this->info(print_r($apiParameters, true));
+
+
+                if ($apiIntent == 'best-attempt') {
+                    $conversation = new BestAttempt();
+                }
+                if ($apiIntent == 'math') {
+                    $conversation = new Math();
+                }
+                if ($apiIntent == 'last-log') {
+                    $conversation = new LastLog();
+                }
+                if ($apiIntent == 'how-was-your-raid') {
+                    $conversation = new HowWasYourRaid();
+                }
+
+                $conversation->setApiParameters($apiParameters);
+                $bot->startConversation($conversation);
+            }
         });
 
         $botman->fallback(function(BotMan $bot) {
