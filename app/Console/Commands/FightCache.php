@@ -55,7 +55,7 @@ class FightCache extends Command
             $this->error('Error: no such boss exists in our DB. Might consider adding it first?');
         }
 
-        $metrics = BossMetric::factory($boss->id);
+        $metrics = BossMetric::getByBossId($boss->id);
 
         foreach ($metrics as $metric) {
             $metric->setFight($fight);

@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AbilityAdd;
 use App\Console\Commands\BossAdd;
 use App\Console\Commands\FightCache;
 use App\Console\Commands\LogCache;
@@ -20,7 +21,8 @@ class Kernel extends ConsoleKernel
         RunBot::class,
         LogCache::class,
         BossAdd::class,
-        FightCache::class
+        FightCache::class,
+        AbilityAdd::class
     ];
 
     /**

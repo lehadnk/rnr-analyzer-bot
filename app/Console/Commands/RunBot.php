@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Conversations\BestAttempt;
+use App\Conversations\FailsOnAbility;
 use App\Conversations\HowWasYourRaid;
 use App\Conversations\LastLog;
 use App\Conversations\Math;
@@ -98,9 +99,17 @@ class RunBot extends Command
                 if ($apiIntent == 'how-was-your-raid') {
                     $conversation = new HowWasYourRaid();
                 }
+                if ($apiIntent == 'fails-on-ability') {
+                    $conversation = new FailsOnAbility();
+                }
 
                 $conversation->setApiParameters($apiParameters);
-                $bot->startConversation($conversation);
+                try {
+                    $bot->startConversation($conversation);
+                } catch (\Exception $e) {
+                    //$bot->reply("Хуйню какую-то понаписали: {$e->getMessage()}");
+                }
+
             }
         });
 

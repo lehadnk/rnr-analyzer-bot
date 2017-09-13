@@ -8,6 +8,8 @@
 namespace App;
 
 
+use App\Helpers\DB;
+
 class PatientZero extends AbstractStrategy
 {
     public function run() {
@@ -33,5 +35,28 @@ class PatientZero extends AbstractStrategy
         $metricData->unit_id = $source;
         $metricData->value = 1;
         $metricData->save();
+    }
+
+    public function getReport($raidDate) {
+        $result = \DB::select("
+                SELECT fi.name, sum(bm.value) AS cnt
+                FROM boss_metric_datas bm
+                JOIN fight_units fi ON fi.unit_id = bm.unit_id AND bm.fight_id = fi.fight_id
+                JOIN fights f ON bm.fight_id = f.id
+                WHERE bm.metric_id = :id AND f.raid_date = :raidDate
+                GROUP BY fi.name
+                ORDER BY cnt DESC
+        ", [
+            ':raidDate' => $raidDate,
+            ':id' => $this->metric_id,
+        ]);
+
+        $message = $this->metric->info_message.PHP_EOL.PHP_EOL;
+
+        foreach ($result as $row) {
+            $message .= "{$row->name}: {$row->cnt}".PHP_EOL;
+        }
+
+        return $message;
     }
 }

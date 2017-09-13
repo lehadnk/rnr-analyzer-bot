@@ -15,10 +15,15 @@ abstract class AbstractStrategy {
      */
     protected $fight;
     protected $metric_id;
+    /**
+     * @var BossMetric
+     */
+    protected $metric;
 
-    public function __construct($payload, $metric_id) {
-        $this->data = json_decode($payload);
-        $this->metric_id = $metric_id;
+    public function __construct(BossMetric $metric) {
+        $this->data = json_decode($metric->payload);
+        $this->metric_id = $metric->id;
+        $this->metric = $metric;
     }
 
     public function setFight(Fight $fight) {
@@ -26,4 +31,6 @@ abstract class AbstractStrategy {
     }
 
     abstract function run();
+
+    abstract function getReport($raidDate);
 }
