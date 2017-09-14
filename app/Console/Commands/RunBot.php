@@ -7,6 +7,7 @@ use App\Conversations\FailsOnAbility;
 use App\Conversations\HowWasYourRaid;
 use App\Conversations\LastLog;
 use App\Conversations\Math;
+use App\Conversations\PlayerFailDetail;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Cache\ArrayCache;
@@ -95,6 +96,9 @@ class RunBot extends Command
                 }
                 if ($apiIntent == 'fails-on-ability') {
                     $conversation = new FailsOnAbility();
+                }
+                if ($apiIntent == 'player-fail-detail') {
+                    $conversation = new PlayerFailDetail();
                 }
 
                 $conversation->setApiParameters($apiParameters);

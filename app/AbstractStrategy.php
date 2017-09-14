@@ -33,4 +33,6 @@ abstract class AbstractStrategy {
     abstract function run();
 
     abstract function getReport($raidDate);
+
+    abstract function getPlayerDetailedReport($raidDate, $playerName);
 }

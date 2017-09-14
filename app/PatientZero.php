@@ -59,4 +59,26 @@ class PatientZero extends AbstractStrategy
 
         return $message;
     }
+
+    public function getPlayerDetailedReport($raidDate, $playerName) {
+        $result = \DB::select("
+                SELECT f.log_id, f.fight_id
+                FROM boss_metric_datas bm
+                JOIN fight_units fi ON fi.unit_id = bm.unit_id AND bm.fight_id = fi.fight_id
+                JOIN fights f ON bm.fight_id = f.id
+                WHERE bm.metric_id = :id AND f.raid_date = :raidDate AND fi.name = :playerName
+        ", [
+            ':raidDate' => $raidDate,
+            ':id' => $this->metric_id,
+            ':playerName' => $playerName
+        ]);
+
+        $message = "Изи! Детализация по $playerName:".PHP_EOL.PHP_EOL;
+
+        foreach ($result as $row) {
+            $message .= "https://www.warcraftlogs.com/reports/{$row->log_id}#view=events&fight={$row->fight_id}&type=deaths&ability={$this->data->ability}".PHP_EOL;
+        }
+
+        return $message;
+    }
 }
