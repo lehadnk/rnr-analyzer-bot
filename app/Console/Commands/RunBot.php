@@ -8,6 +8,7 @@ use App\Conversations\HowWasYourRaid;
 use App\Conversations\LastLog;
 use App\Conversations\Math;
 use App\Conversations\PlayerFailDetail;
+use App\Conversations\UpdateLog;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Cache\ArrayCache;
@@ -100,12 +101,15 @@ class RunBot extends Command
                 if ($apiIntent == 'player-fail-detail') {
                     $conversation = new PlayerFailDetail();
                 }
+                if ($apiIntent == 'update-log') {
+                    $conversation = new UpdateLog();
+                }
 
                 $conversation->setApiParameters($apiParameters);
                 try {
                     $bot->startConversation($conversation);
                 } catch (\Exception $e) {
-                    //$bot->reply("Хуйню какую-то понаписали: {$e->getMessage()}");
+                    $bot->reply("Хуйню какую-то понаписали: {$e->getMessage()}");
                 }
 
             }

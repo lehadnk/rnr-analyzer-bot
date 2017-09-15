@@ -44,12 +44,22 @@ class LogCache extends Command
         $this->logId = $this->argument('id');
         $this->raidDate = $this->argument('raidDate');
 
-        //$baseUrl = "https://www.warcraftlogs.com/reports/$logId#type=deaths&boss=-2&difficulty=0";
+        $fights = Fight
+            ::where('log_id', '=', $this->logId)
+            ->where('raid_date', '=', $this->raidDate)
+            ->get();
 
-        $this->getFights();
+        if ($fights->count() > 0) {
+            $this->info('Old log with the same id found, removing old data...');
+            foreach ($fights as $fight) {
+                $fight->remove();
+            }
+        }
+
+        $this->storeFights();
     }
 
-    private function getFights() {
+    private function storeFights() {
         $url = "https://www.warcraftlogs.com/reports/fights_and_participants/{$this->logId}/0";
 
         $json = file_get_contents($url);

@@ -15,6 +15,7 @@ use App\BossMetric;
 
 class PlayerFailDetail extends ConversationBase
 {
+
     public function giveAnswer()
     {
         /*$bossName = $this->getDataFieldValue('BossName');
