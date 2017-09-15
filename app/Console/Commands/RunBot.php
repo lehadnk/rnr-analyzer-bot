@@ -66,7 +66,6 @@ class RunBot extends Command
             $botman->middleware->received($apiAi);
 
             $botman->hears('', function (BotMan $bot) {
-                var_dump($bot->getMessage()->getText());
                 $botUserId = env('DISCORD_BOT_USER_ID');
                 if ($bot->getMessage()->getSender() == $botUserId) {
                     return;
