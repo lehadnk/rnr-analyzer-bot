@@ -64,10 +64,11 @@ class RunBot extends Command
         $botman->middleware->received($apiAi);
 
         $botman->hears('', function(BotMan $bot) {
-            if ($bot->getMessage()->getSender() == '356858235208204288') {
+            $botUserId = env('DISCORD_BOT_USER_ID');
+            if ($bot->getMessage()->getSender() == $botUserId) {
                 return;
             }
-            if (!stristr($bot->getMessage()->getText(), '<@356858235208204288>')) {
+            if (!stristr($bot->getMessage()->getText(), "<@$botUserId>")) {
                 return;
             }
 
