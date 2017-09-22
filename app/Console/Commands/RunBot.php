@@ -26,7 +26,7 @@ class RunBot extends Command
      *
      * @var string
      */
-    protected $signature = 'run:bot';
+    protected $signature = 'run:bot {--debug=0}';
 
     /**
      * The console command description.
@@ -52,8 +52,10 @@ class RunBot extends Command
      */
     public function handle()
     {
+        $debugMode = (boolean) $this->option('debug');
+
         try {
-            $apiAi = \App\Helpers\ApiAi::create('22b84338101e4215bf593bb1353af81c')->listenForAction();
+            $apiAi = \App\Helpers\ApiAi::create(env('API_AI_TOKEN'))->listenForAction();
 
             $loop = Factory::create();
             DriverManager::loadDriver(DiscordDriver::class);
@@ -65,7 +67,7 @@ class RunBot extends Command
 
             $botman->middleware->received($apiAi);
 
-            $botman->hears('', function (BotMan $bot) {
+            $botman->hears('', function (BotMan $bot) use ($debugMode) {
                 $botUserId = env('DISCORD_BOT_USER_ID');
                 if ($bot->getMessage()->getSender() == $botUserId) {
                     return;
@@ -79,6 +81,13 @@ class RunBot extends Command
                 $apiAction = $extras['apiAction'] ?? null;
                 $apiIntent = $extras['apiIntent'] ?? null;
                 $apiParameters = $extras['apiParameters'] ?? [];
+                $message = $bot->getMessage()->getText();
+                $data = explode('|', $message);
+                if (count($data) < 3) {
+                    return;
+                }
+                $apiIntent = $data[1];
+                $apiParameters = json_decode($data[2], true);
 
                 if ($apiReply) {
                     $bot->reply($apiReply);
@@ -86,41 +95,22 @@ class RunBot extends Command
                     $this->info($apiIntent);
                     $this->info(print_r($apiParameters, true));
 
-                    if ($apiIntent == 'best-attempt') {
-                        $conversation = new BestAttempt();
-                    }
-                    if ($apiIntent == 'math') {
-                        $conversation = new Math();
-                    }
-                    if ($apiIntent == 'last-log') {
-                        $conversation = new LastLog();
-                    }
-                    if ($apiIntent == 'how-was-your-raid') {
-                        $conversation = new HowWasYourRaid();
-                    }
-                    if ($apiIntent == 'fails-on-ability') {
-                        $conversation = new FailsOnAbility();
-                    }
-                    if ($apiIntent == 'player-fail-detail') {
-                        $conversation = new PlayerFailDetail();
-                    }
-                    if ($apiIntent == 'update-log') {
-                        $conversation = new UpdateLog();
-                    }
-
-                    $conversation->setApiParameters($apiParameters);
                     try {
+                        $conversation = \App\Conversations\Factory::factory($apiIntent);
+                        $conversation->setApiParameters($apiParameters);
                         $bot->startConversation($conversation);
                     } catch (\Exception $e) {
-                        $bot->reply("Хуйню какую-то понаписали: {$e->getMessage()}");
+                        $this->error($e->getMessage());
+                        if ($debugMode) {
+                            $bot->reply("Хуйню какую-то понаписали: {$e->getMessage()}");
+                        }
                     }
-
                 }
             });
 
             $loop->run();
         } catch (Exception $e) {
-            var_dump($e->getMessage());
+            $this->error($e->getMessage());
         }
     }
 }
