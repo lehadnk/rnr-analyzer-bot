@@ -92,6 +92,8 @@ class LogCache extends Command
                 continue;
             }
 
+            $this->info("New attempt discovered! Parsing...");
+
             $model = new Fight();
             $model->log_id = $this->logId;
             $model->fight_id = $fight->id;
