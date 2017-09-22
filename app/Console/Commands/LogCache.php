@@ -13,7 +13,7 @@ class LogCache extends Command
      *
      * @var string
      */
-    protected $signature = 'log:cache {id} {raidDate}';
+    protected $signature = 'log:cache {id} {raidDate} {--reupload=0}';
 
     /**
      * The console command description.
@@ -22,7 +22,7 @@ class LogCache extends Command
      */
     protected $description = 'Command description';
 
-    private $logId, $raidDate;
+    private $logId, $raidDate, $reUpload;
 
     /**
      * Create a new command instance.
@@ -43,23 +43,38 @@ class LogCache extends Command
     {
         $this->logId = $this->argument('id');
         $this->raidDate = $this->argument('raidDate');
+        $this->reUpload = (boolean) $this->option('reupload');
 
-        $fights = Fight
-            ::where('log_id', '=', $this->logId)
-            ->where('raid_date', '=', $this->raidDate)
-            ->get();
-
-        if ($fights->count() > 0) {
-            $this->info('Old log with the same id found, removing old data...');
-            foreach ($fights as $fight) {
-                $fight->remove();
-            }
+        if ($this->reUpload) {
+            $this->info("Re-upload mode: removing old log data first...");
+            $this->deleteFights();
         }
 
         $this->storeFights();
     }
 
+    private function deleteFights() {
+        $fights = $this->getStoredFights();
+
+        if ($fights->count() > 0) {
+            $this->info("{$fights->count()} old attempts found, removing...");
+            foreach ($fights as $fight) {
+                $fight->remove();
+            }
+        }
+    }
+
+    private function getStoredFights() {
+        return Fight
+            ::where('log_id', '=', $this->logId)
+            ->where('raid_date', '=', $this->raidDate)
+            ->get();
+    }
+
     private function storeFights() {
+        $fights = $this->getStoredFights();
+        $lastFightId = $fights->max('fight_id');
+
         $url = "https://www.warcraftlogs.com/reports/fights_and_participants/{$this->logId}/0";
 
         $json = file_get_contents($url);
@@ -69,6 +84,10 @@ class LogCache extends Command
         }
 
         foreach ($data->fights as $fight) {
+            if ($fight->id <= $lastFightId) {
+                continue;
+            }
+
             if ($fight->boss == 0) {
                 continue;
             }
