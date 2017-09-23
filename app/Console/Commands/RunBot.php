@@ -73,12 +73,10 @@ class RunBot extends Command
                     return;
                 }
                 if (!stristr($bot->getMessage()->getText(), "<@$botUserId>")) {
-                    die('123');
                     return;
                 }
 
                 $extras = $bot->getMessage()->getExtras();
-                var_dump($extras);
                 $apiReply = $extras['apiReply'] ?? null;
                 $apiAction = $extras['apiAction'] ?? null;
                 $apiIntent = $extras['apiIntent'] ?? null;
