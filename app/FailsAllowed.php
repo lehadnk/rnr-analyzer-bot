@@ -34,7 +34,7 @@ class FailsAllowed extends AbstractStrategy
         }
 
         $allowedData = collect($allowedData->events);
-        
+
         foreach ($failsData->events as $event) {
             if ($event->type !== 'applydebuff') {
                 continue;
@@ -46,7 +46,7 @@ class FailsAllowed extends AbstractStrategy
                 ->where('targetID', '=', $event->targetID)
                 ->count();
 
-            if ($allowedEventsCount > 0) {
+            if ($allowedEventsCount == 0) {
                 $metricData = new BossMetricData();
                 $metricData->fight_id = $this->fight->id;
                 $metricData->metric_id = $this->metric_id;
@@ -55,10 +55,6 @@ class FailsAllowed extends AbstractStrategy
                 $metricData->save();
             }
         }
-
-
-
-
     }
 
     public function getReport($raidDate) {
@@ -86,7 +82,7 @@ class FailsAllowed extends AbstractStrategy
 
     public function getPlayerDetailedReport($raidDate, $playerName) {
         $result = \DB::select("
-                SELECT f.log_id, f.fight_id
+                SELECT f.log_id, f.fight_id, fi.unit_id
                 FROM boss_metric_datas bm
                 JOIN fight_units fi ON fi.unit_id = bm.unit_id AND bm.fight_id = fi.fight_id
                 JOIN fights f ON bm.fight_id = f.id
@@ -100,7 +96,7 @@ class FailsAllowed extends AbstractStrategy
         $message = "Изи! Детализация по $playerName:".PHP_EOL.PHP_EOL;
 
         foreach ($result as $row) {
-            $message .= "https://www.warcraftlogs.com/reports/{$row->log_id}#view=events&fight={$row->fight_id}&type=deaths&ability={$this->data->ability}".PHP_EOL;
+            $message .= "https://www.warcraftlogs.com/reports/{$row->log_id}#view=events&fight={$row->fight_id}&type=damage-taken&ability={$this->data->failAbility}&source={$row->unit_id}".PHP_EOL;
         }
 
         return $message;
