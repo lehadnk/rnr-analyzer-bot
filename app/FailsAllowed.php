@@ -35,14 +35,16 @@ class FailsAllowed extends AbstractStrategy
 
         $allowedData = collect($allowedData->events);
 
+        $timeWindow = $this->data->timeWindow * 1000;
+
         foreach ($failsData->events as $event) {
             if ($event->type !== 'applydebuff') {
                 continue;
             }
 
             $allowedEventsCount = $allowedData
-                ->where('timestamp', '>', $event->timestamp - $this->data->timeWindow)
-                ->where('timestamp', '<', $event->timestamp + $this->data->timeWindow)
+                ->where('timestamp', '>', $event->timestamp - $timeWindow)
+                ->where('timestamp', '<', $event->timestamp + $timeWindow)
                 ->where('targetID', '=', $event->targetID)
                 ->count();
 
