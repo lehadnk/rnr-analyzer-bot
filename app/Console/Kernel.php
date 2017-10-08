@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\AbilityAdd;
 use App\Console\Commands\BossAdd;
+use App\Console\Commands\DebugMetric;
 use App\Console\Commands\FightCache;
 use App\Console\Commands\LogCache;
 use App\Console\Commands\LogLive;
@@ -24,7 +25,8 @@ class Kernel extends ConsoleKernel
         BossAdd::class,
         FightCache::class,
         AbilityAdd::class,
-        LogLive::class
+        LogLive::class,
+        DebugMetric::class
     ];
 
     /**

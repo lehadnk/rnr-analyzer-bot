@@ -13,9 +13,7 @@ class BossMetric extends Model
     public static function factory($metrics) {
         $strategies = [];
         foreach ($metrics as $metric) {
-            $strategyClass = "App\\{$metric->strategy}";
-            $strategy = new $strategyClass($metric);
-            $strategies[] = $strategy;
+            $strategies[] = $metric->getStrategy();
         }
 
         return $strategies;
@@ -29,5 +27,12 @@ class BossMetric extends Model
     public static function getByBossId($bossId) {
         $metrics = self::where('boss_id', '=', $bossId)->get();
         return self::factory($metrics);
+    }
+
+    public function getStrategy() {
+        $strategyClass = "App\\{$this->strategy}";
+        $strategy = new $strategyClass($this);
+
+        return $strategy;
     }
 }
